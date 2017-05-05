@@ -1,0 +1,14 @@
+---
+applications:
+- name: prime-client
+  path: client
+  command: node primeClientApp.js
+  memory: 256M
+- name: prime-service
+  path: service
+  command: node primeServiceApp.js
+  memory: 256M
+- name: prime-service-broker
+  path: broker
+  command: node primeServiceBrokerApp.js
+  memory: 256M

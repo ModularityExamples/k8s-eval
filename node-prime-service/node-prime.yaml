@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  labels:
+    run: postgres
+spec:
+  ports:
+  - port: 5432
+    protocol: TCP
+    nodePort: 32100
+  selector:
+    run: postgres
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_PASSWORD
+          value: "mysecretpassword"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prime-broker
+  labels:
+    run: prime-broker
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    nodePort: 32200
+  selector:
+    run: prime-broker
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: prime-broker
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: prime-broker
+    spec:
+      containers:
+      - name: prime-broker
+        image: 192.168.99.102:5000/prime-broker
+        ports:
+        - containerPort: 80
+        env:
+        - name: POSTGRES_URL
+          value: "postgres://postgres:mysecretpassword@postgres-service:5432/postgres"
+        - name: APP_PORT
+          value: "80"
+        - name: TARGET_HOST
+          value: "http://prime-service.example.com"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prime-service
+  labels:
+    run: prime-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    nodePort: 32300
+  selector:
+    run: prime-service
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: prime-service
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: prime-service
+    spec:
+      containers:
+      - name: prime-service
+        image: 192.168.99.102:5000/prime-service
+        ports:
+        - containerPort: 80
+        env:
+        - name: POSTGRES_URL
+          value: "postgres://postgres:mysecretpassword@postgres-service:5432/postgres"
+        - name: APP_PORT
+          value: "80"

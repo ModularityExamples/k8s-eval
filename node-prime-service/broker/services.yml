@@ -1,0 +1,16 @@
+# This file should not be used in deployed environments. Instead, set
+# a corresponding environment variable to point to a configuration
+# file that contains these settings.
+
+
+services:
+- name: prime
+  id: 8ed1503e-1659-4729-bd56-032a8c545731
+  description: Prime numbers generating and storing service
+  bindable: true
+  tags:
+    - prime number
+  plans:
+  - name: free
+    id: b150d34a-37e0-4269-9cb2-018310f5e9f5
+    description: Shared prime service, not thread-safe within a service instance

@@ -1,0 +1,10 @@
+xID format => UUID, stripping '-' gives me "2637ABD31F...."
+
+Broker
+  => create table NUMBER_STORE IF NOT EXISTS
+    id : string
+    number : long
+
+Service instance
+  => own row in NUMBER_STORE
+  => delete row on deletion of instance
